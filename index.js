@@ -11,15 +11,32 @@ connectDb()
 app.use(express.json());
 
 app
-.get('/api/blogs', (req, res) => {
-    blog.find()
-    .then(blogs => {
-      res.status(200).json(blogs);
-    })
-    .catch(e => {
-      res.status(500).json({ error: "Something went wrong" });
-    });
-  })
+// .get('/api/blogs', (req, res) => {
+  
+//   blog.find()
+//   .then(blogs => {
+//     res.status(200).json(blogs);
+//   })
+//   .catch(e => {
+//     res.status(500).json({ error: "Something went wrong" });
+//   });
+// })
+
+.get('/api/blogs',async (req, res) => {
+  const search = req.query.term || ""
+  try {
+    const blogs = await blog.find({
+      title:{$regex:search , $options:"i"}
+    })  
+    
+    res.status(200).json(blogs)
+  } catch (error) {
+    res.status(500).json("error")
+  }
+
+
+})  
+
 
   //get a specific blog
 
@@ -72,7 +89,23 @@ app
 })
 
 .put("/api/blogs/:id", async(req,res) => {
-  
+  const {title,content, category, tags} = req.body;
+
+  try {
+    const updatedBlog = await blog.findByIdAndUpdate(req.params.id,
+      {title,content,category,tags},
+      { new: true, runValidators: true }
+    )
+
+    if(!updatedBlog){
+      return res.status(404).json("no blog with this id found ")
+    }
+
+    res.status(200).json(updatedBlog)
+    
+  } catch (error) {
+    res.status(500).json("failed to update")
+  }
 })
 
 

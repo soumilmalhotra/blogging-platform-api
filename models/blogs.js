@@ -16,15 +16,7 @@ const blogSchema = new mongoose.Schema({
     tags:{
         type:[String],
         required:true
-    },
-    createdAt:{
-        type:Date,
-        default: Date.now
-    },
-    updatedAt:{
-        type:Date,
-        default: Date.now
-    },
-})
+    }
+}, { timestamps: true })
 
 module.exports= mongoose.model("blog", blogSchema)
